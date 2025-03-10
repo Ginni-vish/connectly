@@ -1,14 +1,13 @@
-// @ts-nocheck
-'use client'
+'use client';
 import { useRouter } from 'next/navigation';
 import { useGetCalls } from '../../hooks/useGetCalls';
 import { useEffect, useState } from 'react';
-import { Call, CallRecording } from '@stream-io/video-react-sdk'; // ✅ Fixed import
+import { Call, CallRecording } from '@stream-io/video-react-sdk';
 import MeetingCard from './MeetingCard';
 import Loader from './Loader';
 import { useToast } from './ui/use-toast';
 
-const CallList = ({ type }:{type:'ended'|'upcoming' | 'recordings'}) => {
+const CallList = ({ type }: { type: 'ended' | 'upcoming' | 'recordings' }) => {
   const { endedCalls, upcomingCalls, callRecordings, isLoading } = useGetCalls();
   const router = useRouter();
   const [recordings, setRecordings] = useState<CallRecording[]>([]);
@@ -43,21 +42,19 @@ const CallList = ({ type }:{type:'ended'|'upcoming' | 'recordings'}) => {
   useEffect(() => {
     const fetchRecordings = async () => {
       try {
-        const callData = await Promise.all(
+        const fetchedRecordings = await Promise.all(
           callRecordings?.map((meeting) => meeting.queryRecordings()) ?? []
         );
-        const recordings = callData
-          .filter((call) => call.recordings.length > 0)
-          .flatMap((call) => call.recordings);
-
-        setRecordings(recordings);
+        setRecordings(
+          fetchedRecordings.flatMap((call) => call?.recordings || [])
+        );
       } catch (error) {
         toast({ title: 'Try again later' });
       }
     };
 
     if (type === 'recordings') fetchRecordings();
-  }, [type, callRecordings]);
+  }, [type, callRecordings, toast]); // Ensured correct dependencies
 
   const calls = getCalls();
   const noCallsMessage = getNoCallsMessage();
@@ -69,11 +66,7 @@ const CallList = ({ type }:{type:'ended'|'upcoming' | 'recordings'}) => {
       {calls && calls.length > 0 ? (
         calls.map((meeting: Call | CallRecording) => (
           <MeetingCard
-            key={
-              (meeting as Call)?.id ||
-              (meeting as CallRecording)?.start_time ||
-              `recording-${Math.random()}`
-            }
+            key={(meeting as Call)?.id || (meeting as CallRecording)?.start_time}
             icon={
               type === 'ended'
                 ? '/icons/previous.svg'
@@ -84,7 +77,7 @@ const CallList = ({ type }:{type:'ended'|'upcoming' | 'recordings'}) => {
             title={
               (meeting as Call)?.state?.custom?.description?.substring(0, 26) ||
               (meeting as CallRecording)?.filename?.substring(0, 20) ||
-              'Personal Meeting'
+              'Untitled Meeting'
             }
             date={
               (meeting as Call)?.state?.startsAt?.toLocaleString() ||

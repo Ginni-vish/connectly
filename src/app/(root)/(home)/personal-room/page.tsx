@@ -29,7 +29,7 @@ const PersonalRoom = () => {
     const newCall = client.call('default' , meetingId!)
 
     if(!call){
-      const newCall = client.call('default',meetingId!)
+      
       await newCall.getOrCreate({
       data:{
         starts_at: new Date().toISOString(),

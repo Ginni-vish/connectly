@@ -1,5 +1,5 @@
 import React,{ ReactNode} from 'react'
-import { Stream } from 'stream'
+
 import StreamVideoProvider from '../../../providers/StreamClientProvider';
 import { Metadata } from 'next';
 

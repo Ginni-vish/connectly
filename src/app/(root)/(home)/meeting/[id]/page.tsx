@@ -17,7 +17,7 @@ const Meeting = ({ params }: { params: Promise<{ id: string }> }) => {
   const { call, isCallLoading } = useGetCallById(id);
 
   if (!isLoaded || isCallLoading) return <Loader />;
-  
+  console.log("Current User:", user);
   return (
     <main className="h-screen w-full">
       <StreamCall call={call}>
